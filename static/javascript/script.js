@@ -1,7 +1,5 @@
-
 const form = document.getElementById('text-form');
 const highlightedTextDiv = document.getElementById('highlightedText');
-const saveAudioButton = document.getElementById('saveAudio');
 const playButton = document.getElementById('playBtn');
 const pauseButton = document.getElementById('pauseBtn');
 const stopButton = document.getElementById('stopBtn');
@@ -9,8 +7,6 @@ const resumeButton = document.getElementById('resumeBtn');
 let speechSynthesis = window.speechSynthesis;
 let utterance; // Store the utterance for playback control
 let currentIndex = 0; // Index for highlighted words
-let audioChunks = []; // To store audio chunks for saving
-let mediaRecorder; // MediaRecorder instance
 let isSpeaking = false; // Flag to track if speaking
 
 form.addEventListener('submit', function (e) {
@@ -18,7 +14,6 @@ form.addEventListener('submit', function (e) {
     const text = document.getElementById('text').value;
     highlightText(text);
     speakText(text);
-    saveAudioButton.style.display = 'block'; // Show the Save Audio button
 });
 
 function highlightText(text) {
@@ -34,18 +29,8 @@ function speakText(text) {
     }
 
     utterance = new SpeechSynthesisUtterance(text);
-    const words = text.split(' ');
 
-    // Create a new AudioContext and MediaRecorder to record audio
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const destination = audioContext.createMediaStreamDestination();
-    mediaRecorder = new MediaRecorder(destination.stream);
-    audioChunks = []; // Reset audio chunks for new recording
-
-    // Connect the SpeechSynthesis audio output to the MediaRecorder
     utterance.onstart = function () {
-        const source = audioContext.createMediaStreamSource(destination.stream);
-        source.connect(audioContext.destination);
         isSpeaking = true; // Update speaking flag
         playButton.style.display = 'none'; // Hide play button
         pauseButton.style.display = 'inline-block'; // Show pause button
@@ -67,10 +52,10 @@ function speakText(text) {
 
     // Event handler for when speech has finished
     utterance.onend = function () {
-        // Remove highlight after speaking
         const spans = highlightedTextDiv.querySelectorAll('span');
-        spans.forEach(span => span.classList.remove('highlight'));
+        spans.forEach(span => span.classList.remove('highlight')); // Remove highlights
         currentIndex = 0; // Reset current index
+        isSpeaking = false; // Update speaking flag
 
         // Display message after speech has finished
         const messageDiv = document.createElement('div');
@@ -78,18 +63,10 @@ function speakText(text) {
         messageDiv.textContent = 'Speech has been spoken';
         highlightedTextDiv.appendChild(messageDiv); // Append message to highlighted text div
 
-        mediaRecorder.stop(); // Stop recording after speech has finished
-        isSpeaking = false; // Update speaking flag
         playButton.style.display = 'inline-block'; // Show play button
         pauseButton.style.display = 'none'; // Hide pause button
         stopButton.style.display = 'none'; // Hide stop button
         resumeButton.style.display = 'none'; // Hide resume button
-    };
-
-    // Start recording audio
-    mediaRecorder.start();
-    mediaRecorder.ondataavailable = function (event) {
-        audioChunks.push(event.data); // Collect audio chunks
     };
 
     // Speak the text
@@ -139,8 +116,3 @@ resumeButton.addEventListener('click', function () {
     stopButton.style.display = 'inline-block'; // Show stop button
     resumeButton.style.display = 'none'; // Hide resume button
 });
-
-
-
-
-
