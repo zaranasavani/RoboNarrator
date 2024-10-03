@@ -39,3 +39,4 @@ Navigate into the project directory and install the required dependencies using 
 ```bash
   python main.py
 ```
+- Open the browser and access the web app on http://localhost:5000/.
