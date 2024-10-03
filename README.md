@@ -1,5 +1,5 @@
 
-# RoboNarrator
+# RoboNarrator 🤖==>🗣️
 
 "RoboNarrator" is a web-based Text-to-Speech (TTS) application. It allows users to input text and convert it to speech using the pyttsx3 library for text-to-speech functionality. The web interface also highlights the text being spoken, offering playback controls like play, pause, stop, and resume.
 
